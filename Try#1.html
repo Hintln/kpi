@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пошук тегів мов програмування</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
+        #searchInput { width: 100%; padding: 12px; font-size: 16px; }
+        #tagList { list-style: none; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; }
+        li { padding: 8px; margin: 5px; background: #f4f4f4; border-radius: 5px; cursor: pointer; }
+        .popup { display: none; position: fixed; background: rgba(0, 0, 0, 0.5); top: 0; left: 0; width: 100%; height: 100%; }
+        .popup-content { background: white; margin: 10% auto; padding: 20px; width: 300px; position: relative; }
+        .close { float: right; cursor: pointer; }
+        pre { background: #eee; padding: 10px; border-radius: 5px; white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <input type="text" id="searchInput" placeholder="Пошук тегів..." oninput="debouncedSearchTags()">
+    <ul id="tagList">
+        <li data-language="HTML" data-tags="markup web structure" data-syntax="&lt;ul&gt;\n  &lt;li&gt;Список&lt;/li&gt;\n  &lt;li&gt;Тегів&lt;/li&gt;\n  &lt;li&gt;HTML&lt;/li&gt;\n&lt;/ul&gt;\n&lt;a href='#'&gt;Посилання&lt;/a&gt;\n&lt;img src='image.jpg' alt='Зображення' /&gt;">HTML - Markup Language</li>
+        <li data-language="CSS" data-tags="style design layout" data-syntax="body { background-color: lightblue; }\nh1 { color: darkblue; font-size: 24px; }\np { line-height: 1.5; }\nul { list-style-type: square; }">CSS - Styling Language</li>
+        <li data-language="JavaScript" data-tags="scripting dynamic interactive" data-syntax="console.log('Hello, world!');\nfunction greet(name) {\n    alert(`Привіт, ${name}!`);\n}\ngreet('Світ');\nconst numbers = [1, 2, 3];\nnumbers.forEach(num => console.log(num));">JavaScript - Web Scripting</li>
+        <li data-language="Python" data-tags="high-level readable versatile" data-syntax="print('Hello, world!')\ndef greet(name):\n    print(f'Привіт, {name}')\ngreet('Світ')\nlist_of_numbers = [1, 2, 3]\nfor num in list_of_numbers:\n    print(num)">Python - General Purpose Language</li>
+        <li data-language="Java" data-tags="object-oriented backend scalable" data-syntax="System.out.println('Hello, world!');\npublic class Greeter {\n    public static void greet(String name) {\n        System.out.println('Привіт, ' + name);\n    }\n}\nGreeter.greet('Світ');\nint[] numbers = {1, 2, 3};\nfor (int num : numbers) {\n    System.out.println(num);\n}">Java - Backend Development</li>
+        <li data-language="C#" data-tags="object-oriented .net microsoft" data-syntax="Console.WriteLine('Hello, world!');\nclass Greeter {\n    public static void Greet(string name) {\n        Console.WriteLine($"Привіт, {name}");\n    }\n}\nGreeter.Greet("Світ");\nint[] numbers = {1, 2, 3};\nforeach (var num in numbers) {\n    Console.WriteLine(num);\n}">C# - Microsoft .NET Language</li>
+        <li data-language="Ruby" data-tags="scripting rails web" data-syntax="puts 'Hello, world!'\ndef greet(name)\n    puts "Привіт, #{name}"\nend\ngreet('Світ')\nnumbers = [1, 2, 3]\nnumbers.each { |num| puts num }">Ruby - Web Development</li>
+        <li data-language="PHP" data-tags="server-side dynamic web" data-syntax="<?php echo 'Hello, world!'; ?>\n<?php\nfunction greet($name) {\n    echo "Привіт, $name";\n}\ngreet('Світ');\n$numbers = [1, 2, 3];\nforeach ($numbers as $num) {\n    echo $num;\n}\n?>">PHP - Server-Side Scripting</li>
+    </ul>
+
+    <div id="popup" class="popup" onclick="closePopupOnOutsideClick(event)">
+        <div class="popup-content" onclick="event.stopPropagation()">
+            <span class="close" onclick="closePopup()">×</span>
+            <h2 id="popupTitle"></h2>
+            <div id="popupDetails"></div>
+            <pre id="popupSyntax"></pre>
+        </div>
+    </div>
+
+    <script>
+        let debounceTimer;
+        function debouncedSearchTags() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(searchTags, 300);
+        }
+
+        function searchTags() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const tags = document.querySelectorAll('#tagList li');
+
+            tags.forEach(tag => {
+                const tagName = tag.textContent.toLowerCase();
+                const tagData = tag.getAttribute('data-tags').toLowerCase();
+
+                if (tagName.includes(input) || tagData.includes(input)) {
+                    tag.style.display = '';
+                } else {
+                    tag.style.display = 'none';
+                }
+            });
+        }
+
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+            document.removeEventListener('keydown', closePopupOnEscape);
+        }
+
+        function closePopupOnOutsideClick(event) {
+            if (event.target === document.getElementById('popup')) {
+                closePopup();
+            }
+        }
+
+        function closePopupOnEscape(event) {
+            if (event.key === 'Escape') {
+                closePopup();
+            }
+        }
+
+        function showLanguageDetails(language, details, syntax) {
+            const popup = document.getElementById('popup');
+            document.getElementById('popupTitle').textContent = language;
+            document.getElementById('popupDetails').innerHTML = `<p>${details}</p>`;
+            document.getElementById('popupSyntax').textContent = syntax;
+            popup.style.display = 'block';
+            document.addEventListener('keydown', closePopupOnEscape);
+        }
+
+        document.querySelectorAll('#tagList li').forEach(tag => {
+            tag.addEventListener('click', () => {
+                const language = tag.getAttribute('data-language');
+                const tagDetails = tag.getAttribute('data-tags');
+                const tagSyntax = tag.getAttribute('data-syntax');
+                showLanguageDetails(language, `Tags: ${tagDetails}`, tagSyntax);
+            });
+        });
+    </script>
+</body>
+</html>
